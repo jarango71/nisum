@@ -1,46 +1,75 @@
 package com.nisum.evaluation.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
-public class JwtProvider {
+public class JwtProvider implements InitializingBean {
     private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
     
+    private static final String AUTHORITIES_KEY = "auth";
+    
     @Value("${jwt.secret}")
-    private String jwtSecret;
+    private String secret;
 
     @Value("${jwt.expirationms}")
     private int jwtExpirationMs;
+    
+    private JwtParser jwtParser;
+    
+    private Key key;
+    
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		  byte[] keyBytes;
+	      log.debug("Using a Base64-encoded JWT secret key");
 
-    public String generateJwtToken(Authentication authentication)  {
+	      log.info("***********************************");
+	      log.info(secret);
+	      keyBytes = Decoders.BASE64.decode(secret);
+	      key = Keys.hmacShaKeyFor(keyBytes);
+	      jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+		
+	}
+
+	public String generateJwtToken(Authentication authentication)  {
     	
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
         Instant expirationTime = Instant.now().plus(1, ChronoUnit.HOURS);
         Date expirationDate = Date.from(expirationTime);
-        UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
-        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        
+        Key key = Keys.hmacShaKeyFor(secret.getBytes());
 
         String compactTokenString = Jwts.builder()
-                .claim("sub", userPrincipal.getUsername())
+        		.setSubject(authentication.getName())
+        		.claim(AUTHORITIES_KEY, authorities)
                 .setExpiration(expirationDate)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
         return "Bearer " + compactTokenString;
     }
 
     public String getUserNameFromJwtToken(String token) {
-        byte[] secretBytes = jwtSecret.getBytes();
+        byte[] secretBytes = secret.getBytes();
         Jws<Claims> jwsClaims = Jwts.parserBuilder()
                 .setSigningKey(secretBytes)
                 .build()
@@ -48,25 +77,17 @@ public class JwtProvider {
         return jwsClaims.getBody()
                 .getSubject();
     }
-
-	public boolean validateJwtToken(String token) {
-
+    
+    public boolean validateJwtToken(String authToken) {
         try {
-            byte[] secretBytes = jwtSecret.getBytes();
-            Jwts.parser().setSigningKey(secretBytes).parseClaimsJws(token);
+            jwtParser.parseClaimsJws(authToken);
             return true;
-        } catch (SignatureException e) {
-            log.error("Invalid JWT signature: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty: {}", e.getMessage());
+        } catch (JwtException | IllegalArgumentException e) {
+            log.info("Invalid JWT token.");
+            log.trace("Invalid JWT token trace.", e);
         }
-
         return false;
     }
+
+
 }

@@ -1,42 +1,109 @@
 package com.nisum.evaluation.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.nisum.evaluation.domain.User;
+import com.nisum.evaluation.dto.ActivateAccountDTO;
+import com.nisum.evaluation.dto.UserLoginRequestDTO;
+import com.nisum.evaluation.dto.UserProfileRequestDTO;
 import com.nisum.evaluation.dto.UserRegisterRequestDTO;
 import com.nisum.evaluation.dto.UserResponseDTO;
+import com.nisum.evaluation.mapper.UserRegisterMapper;
+import com.nisum.evaluation.mapper.UserResponseMapper;
 import com.nisum.evaluation.repository.UserRepository;
+import com.nisum.evaluation.security.JWTToken;
+import com.nisum.evaluation.security.JwtProvider;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
     
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    
+    private final JwtProvider jwtProvider;
+    
+    private final UserRegisterMapper userRegisterMapper;
+    
+    private final UserResponseMapper userResponseMapper;
+
     
     @Override
 	public UserResponseDTO register(UserRegisterRequestDTO userRegisterDTO) {
-        User user = new User();
-        user.setName(userRegisterDTO.getName());
-        user.setEmail(userRegisterDTO.getEmail());
-        user.setPassword(userRegisterDTO.getPassword());
-        user.setActive(true);
-        user.setCreated(Date.Now());
-        user.setModified(null);
-        user.setToken(null);
-        //user.setPhones(userRegisterDTO.getPhones());
+    	log.info("Inicio de registro de usuario");
+    	
+        User user = userRegisterMapper.toEntity(userRegisterDTO);
+        user.setActive(false);
+        user.setCreated(LocalDateTime.now());
+        user.setModified(LocalDateTime.now());
+        user.setToken(UUID.randomUUID().toString());
         userRepository.save(user);
         
-        // Arreglarlo
-        return null;
+        log.info("Registro de usuario exitoso");
+        return userResponseMapper.toDto(user);
     }
 
+	@Override
+	public JWTToken login(UserLoginRequestDTO userLoginDTO) {
+		log.info("Inicio de autenticacion");
+		
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail(), userLoginDTO.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtProvider.generateJwtToken(authentication);
+        
+        log.info("Autenticacion exitosa");
+		return new JWTToken(jwt);
+	}
+
+	@Override
+	public void activateAccount(ActivateAccountDTO activateAccountDTO) {
+		log.info("Activando cuenta de usuario");
+		
+		Optional<User> userOpt = userRepository.findByEmailAndToken(activateAccountDTO.getEmail(), activateAccountDTO.getToken());
+		if (!userOpt.isPresent()) {
+			log.error("Activacion invalidad usuario y token no encontrado");
+			throw new RuntimeException("Activacion invalidad");
+		}
+		User user = userOpt.get();
+		user.setActive(true);
+		user.setModified(LocalDateTime.now());
+		userRepository.save(user);
+		
+		log.info("Cuenta activada satisfactoriamente");
+	}
+	
+	@Override
+	public UserResponseDTO updateProfile(String email, UserProfileRequestDTO userProfileDTO) {
+		log.info("Actualizando perfil");
+		
+		User user = userRepository.findByEmail(email).get();
+
+		user.setName(userProfileDTO.getName());
+		user.setModified(LocalDateTime.now());
+		userRepository.save(user);
+		
+		log.info("Actualizacion del perfil exitosa");
+		return userResponseMapper.toDto(user);
+	}
+	
     @Override
 	public boolean userExists(String email) {
     	return userRepository.findByEmail(email).isPresent();
     }
+    
 }

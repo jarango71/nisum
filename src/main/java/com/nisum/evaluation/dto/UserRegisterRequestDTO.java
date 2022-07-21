@@ -9,12 +9,16 @@ import lombok.Data;
 
 @Data
 public class UserRegisterRequestDTO {
+	
 	@NotBlank
 	private String name;
+	
 	@Email
 	private String email;
+	
 	@NotBlank
 	private String password;
+	
 	@NotEmpty
 	private Set<PhoneDTO> phones;
 }

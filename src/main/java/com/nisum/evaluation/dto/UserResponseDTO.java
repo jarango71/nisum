@@ -1,6 +1,10 @@
 package com.nisum.evaluation.dto;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import javax.validation.constraints.NotBlank;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -11,12 +15,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponseDTO {
+	
+	@NotBlank
 	private String token;
-	private String id;
-	private Date created;
-	private Date modified;
+	
+	@NotBlank
+	private UUID id;
+	
+	@NotBlank
+	private LocalDateTime created;
+	
+	@NotBlank
+	private LocalDateTime modified;
+	
+	@NotBlank
 	@JsonProperty("last_login")
-	private Date lastLogin;
+	private LocalDateTime lastLogin;
+	
+	@NotBlank
 	@JsonProperty("isactive")
 	private boolean active;
 }

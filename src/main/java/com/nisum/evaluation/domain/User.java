@@ -1,27 +1,34 @@
 package com.nisum.evaluation.domain;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 
+import org.hibernate.annotations.GenericGenerator;
+
 @Entity
 @Table(name = "users")
 public class User{
+	
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+        name = "UUID",
+        strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    private UUID id;
+	 
     @Column(nullable = false, length = 100)
     private String password;
 
@@ -39,19 +46,22 @@ public class User{
     private String token;
     
     @Column(nullable = false)
-    private Date created;
+    private LocalDateTime created;
 
     @Column(nullable = false)
-    private Date modified;
+    private LocalDateTime modified;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Column(nullable = true)
+    private LocalDateTime lastLogin;
+
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Phone> phones = new HashSet<>();
 
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 
@@ -95,20 +105,28 @@ public class User{
 		this.token = token;
 	}
 
-	public Date getCreated() {
+	public LocalDateTime getCreated() {
 		return created;
 	}
 
-	public void setCreated(Date created) {
+	public void setCreated(LocalDateTime created) {
 		this.created = created;
 	}
 
-	public Date getModified() {
+	public LocalDateTime getModified() {
 		return modified;
 	}
 
-	public void setModified(Date modified) {
+	public void setModified(LocalDateTime modified) {
 		this.modified = modified;
+	}
+
+    public LocalDateTime getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(LocalDateTime lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 
 	public Set<Phone> getPhones() {

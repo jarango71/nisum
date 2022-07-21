@@ -65,6 +65,14 @@ public class Phone{
 		this.contrycode = contrycode;
 	}
 
+    public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
@@ -80,13 +88,5 @@ public class Phone{
 			return false;
 		Phone other = (Phone) obj;
 		return Objects.equals(id, other.id);
-	}
-
-    public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 }
