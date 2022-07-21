@@ -5,7 +5,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.nisum.evaluation.domain.User;
-import com.nisum.evaluation.dto.UserRegisterDTO;
+import com.nisum.evaluation.dto.UserRegisterRequestDTO;
+import com.nisum.evaluation.dto.UserResponseDTO;
 import com.nisum.evaluation.repository.UserRepository;
 
 @Service
@@ -18,17 +19,20 @@ public class UserServiceImpl implements UserService {
     PasswordEncoder passwordEncoder;
     
     @Override
-	public void register(UserRegisterDTO userRegisterDTO) {
+	public UserResponseDTO register(UserRegisterRequestDTO userRegisterDTO) {
         User user = new User();
         user.setName(userRegisterDTO.getName());
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(userRegisterDTO.getPassword());
         user.setActive(true);
-        user.setCreated(null);
+        user.setCreated(Date.Now());
         user.setModified(null);
         user.setToken(null);
         //user.setPhones(userRegisterDTO.getPhones());
         userRepository.save(user);
+        
+        // Arreglarlo
+        return null;
     }
 
     @Override

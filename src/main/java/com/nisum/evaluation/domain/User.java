@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 
 @Entity
 @Table(name = "users")
@@ -28,6 +29,7 @@ public class User{
     private String name;
 
     @Column(nullable = false, unique = true)
+    @Email
     private String email;
 
     @Column(nullable = false)

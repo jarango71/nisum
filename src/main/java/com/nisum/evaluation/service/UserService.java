@@ -1,10 +1,11 @@
 package com.nisum.evaluation.service;
 
-import com.nisum.evaluation.dto.UserRegisterDTO;
+import com.nisum.evaluation.dto.UserRegisterRequestDTO;
+import com.nisum.evaluation.dto.UserResponseDTO;
 
 public interface UserService {
 
-	void register(UserRegisterDTO userRegisterDTO);
+	UserResponseDTO register(UserRegisterRequestDTO userRegisterDTO);
 
 	boolean userExists(String email);
 

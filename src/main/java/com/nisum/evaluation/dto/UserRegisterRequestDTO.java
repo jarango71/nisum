@@ -1,18 +1,21 @@
 package com.nisum.evaluation.dto;
 
 import java.util.Set;
-
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 import lombok.Data;
 
 @Data
-public class UserRegisterDTO {
+public class UserRegisterRequestDTO {
+	@NotBlank
 	private String name;
 	@Email
 	private String email;
-	@Pattern(regexp = "(?=^.{8,}$)((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$")
+	@NotBlank
 	private String password;
+	@NotEmpty
 	private Set<PhoneDTO> phones;
 }
+

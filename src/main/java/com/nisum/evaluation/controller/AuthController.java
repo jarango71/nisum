@@ -19,11 +19,12 @@ import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nisum.evaluation.domain.User;
-import com.nisum.evaluation.dto.UserRegisterDTO;
+import com.nisum.evaluation.dto.MessageResponseDTO;
+import com.nisum.evaluation.dto.UserRegisterRequestDTO;
+import com.nisum.evaluation.dto.UserResponseDTO;
 import com.nisum.evaluation.payload.request.LoginRequest;
 import com.nisum.evaluation.payload.request.RegisterRequest;
 import com.nisum.evaluation.payload.response.JwtResponse;
-import com.nisum.evaluation.payload.response.MessageResponse;
 import com.nisum.evaluation.security.JwtProvider;
 import com.nisum.evaluation.security.UserPrinciple;
 import com.nisum.evaluation.service.UserService;
@@ -77,15 +78,15 @@ public class AuthController {
 	private boolean active;
 */
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterRequestDTO userRegisterDTO) {
         if (userService.userExists(userRegisterDTO.getEmail())) {
             return ResponseEntity
                 .badRequest()
-                .body(new MessageResponse("El correo ya registrado"));
+                .body(new MessageResponseDTO("El correo ya registrado"));
         }
 
-        userService.register(userRegisterDTO);
+        UserResponseDTO response = userService.register(userRegisterDTO);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.ok(response);
     }
 }
