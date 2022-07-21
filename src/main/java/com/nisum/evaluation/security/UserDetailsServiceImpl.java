@@ -45,9 +45,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        user.setLastLogin(LocalDateTime.now());
-        userRepository.save(user);
-        
         return new org.springframework.security.core.userdetails.User(email,
             user.getPassword(),
             grantedAuthorities);

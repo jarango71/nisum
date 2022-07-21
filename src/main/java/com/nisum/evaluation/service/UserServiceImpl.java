@@ -64,8 +64,13 @@ public class UserServiceImpl implements UserService {
                 new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail(), userLoginDTO.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtProvider.generateJwtToken(authentication);
         
+        String jwt = jwtProvider.generateJwtToken(authentication);
+
+        User user = userRepository.findByEmail(userLoginDTO.getEmail()).get();
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+
         log.info("Autenticacion exitosa");
 		return new JWTToken(jwt);
 	}
@@ -76,7 +81,7 @@ public class UserServiceImpl implements UserService {
 		
 		Optional<User> userOpt = userRepository.findByEmailAndToken(activateAccountDTO.getEmail(), activateAccountDTO.getToken());
 		if (!userOpt.isPresent()) {
-			log.error("Activacion invalidad usuario y token no encontrado");
+			log.error("Activacion invalidad - usuario y token no encontrado");
 			throw new RuntimeException("Activacion invalidad");
 		}
 		User user = userOpt.get();

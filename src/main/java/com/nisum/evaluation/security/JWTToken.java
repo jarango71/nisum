@@ -1,21 +1,18 @@
 package com.nisum.evaluation.security;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class JWTToken {
 
-    private String idToken;
+    private String token;
 
-    public JWTToken(String idToken) {
-        this.idToken = idToken;
+    public JWTToken(String token) {
+        this.token = token;
     }
 
-    @JsonProperty("id_token")
-    String getIdToken() {
-        return idToken;
+    public String getToken() {
+        return token;
     }
 
-    void setIdToken(String idToken) {
-        this.idToken = idToken;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

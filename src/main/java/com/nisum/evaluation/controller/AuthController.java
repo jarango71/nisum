@@ -48,19 +48,22 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JWTToken> authenticateUser(@Valid @RequestBody UserLoginRequestDTO userLoginRequestDTO) {
-        return ResponseEntity.ok(userService.login(userLoginRequestDTO));
+       
+    	return ResponseEntity.ok(userService.login(userLoginRequestDTO));
 	}
 
     @PostMapping("/activate/account")
-    public ResponseEntity<Object> activateAccount(@Valid @RequestBody ActivateAccountDTO activateAccountDTO) {
+    public ResponseEntity<MessageResponseDTO> activateAccount(@Valid @RequestBody ActivateAccountDTO activateAccountDTO) {
+    	
     	userService.activateAccount(activateAccountDTO);
-        return ResponseEntity.ok().build();
+
+    	return ResponseEntity.ok(new MessageResponseDTO("La cuenta se ha activado con exito"));
 	}
 
     @PutMapping("/user/profile")
-    public ResponseEntity<Object> userProfile(Principal principal, @Valid @RequestBody UserProfileRequestDTO userProfileDTO) {
+    public ResponseEntity<UserResponseDTO> userProfile(Principal principal, @Valid @RequestBody UserProfileRequestDTO userProfileDTO) {
 
-        return ResponseEntity.ok(userService.updateProfile(principal.getName(), userProfileDTO));
+    	return ResponseEntity.ok(userService.updateProfile(principal.getName(), userProfileDTO));
 	}
 
 }

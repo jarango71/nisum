@@ -1,7 +1,6 @@
 package com.nisum.evaluation.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import org.slf4j.Logger;
@@ -25,7 +24,7 @@ public class JwtProvider implements InitializingBean {
     private static final String AUTHORITIES_KEY = "auth";
     
     @Value("${jwt.secret}")
-    private String secret;
+    private String jwtSecret;
 
     @Value("${jwt.expirationms}")
     private int jwtExpirationMs;
@@ -34,46 +33,42 @@ public class JwtProvider implements InitializingBean {
     
     private Key key;
     
+    
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		  byte[] keyBytes;
-	      log.debug("Using a Base64-encoded JWT secret key");
+      log.debug("Using a Base64-encoded JWT secret key");
 
-	      log.info("***********************************");
-	      log.info(secret);
-	      keyBytes = Decoders.BASE64.decode(secret);
-	      key = Keys.hmacShaKeyFor(keyBytes);
-	      jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
-		
+      key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+      jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
 	}
-
+	
+		
 	public String generateJwtToken(Authentication authentication)  {
-    	
-        String authorities = authentication.getAuthorities().stream()
+       String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         Instant expirationTime = Instant.now().plus(1, ChronoUnit.HOURS);
         Date expirationDate = Date.from(expirationTime);
         
-        Key key = Keys.hmacShaKeyFor(secret.getBytes());
-
         String compactTokenString = Jwts.builder()
         		.setSubject(authentication.getName())
         		.claim(AUTHORITIES_KEY, authorities)
                 .setExpiration(expirationDate)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(key, SignatureAlgorithm.HS256)
+                //.serializeToJsonWith(new JacksonSerializer())
                 .compact();
 
         return "Bearer " + compactTokenString;
     }
 
     public String getUserNameFromJwtToken(String token) {
-        byte[] secretBytes = secret.getBytes();
+        byte[] secretBytes = jwtSecret.getBytes();
         Jws<Claims> jwsClaims = Jwts.parserBuilder()
                 .setSigningKey(secretBytes)
                 .build()
                 .parseClaimsJws(token);
+        
         return jwsClaims.getBody()
                 .getSubject();
     }
