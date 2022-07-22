@@ -48,6 +48,7 @@ import com.nisum.evaluation.security.JwtAuthTokenFilter;
                     .antMatchers("/api/auth/register").permitAll()
                     .antMatchers("/api/auth/activate/account").permitAll()
                     .antMatchers("/api/auth/login").permitAll()
+                    .antMatchers("/v3/**").permitAll()
                     .anyRequest().authenticated();
     
             http.addFilterBefore(authenticationJwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

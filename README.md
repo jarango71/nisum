@@ -78,6 +78,9 @@ La respuesta esperada es como el siguiente JSON:
 }
 ```
 
+## swagger
+
+Para acceder a la definicion del OpenAPI se hace a traves de ***http://localhost:8080/v3/api-docs/***. Para ver la interface de swagger acceder ***http://localhost:8080/v3/api-docs/swagger-ui.html***
 
 
   
