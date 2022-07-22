@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 @SpringBootApplication
 @EnableJpaRepositories("com.nisum.evaluation.repository") 
-@OpenAPIDefinition(info = @Info(title = "Auth API", version = "1.0.0", description = "Proceso de autenticacion"))
+@OpenAPIDefinition(info = @Info(title = "Auth API", version = "1.0.0", description = "Authentication process"))
 @SecurityScheme(name = "authapi", scheme = "Bearer", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
 public class EvaluationApplication {
 

@@ -23,7 +23,7 @@ import com.nisum.evaluation.exception.BadRequestException;
 import com.nisum.evaluation.mapper.UserRegisterMapper;
 import com.nisum.evaluation.mapper.UserResponseMapper;
 import com.nisum.evaluation.repository.UserRepository;
-import com.nisum.evaluation.security.JWTToken;
+import com.nisum.evaluation.security.JwtToken;
 import com.nisum.evaluation.security.JwtProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -50,14 +50,14 @@ public class UserServiceImpl implements UserService {
     
     @Override
 	public UserResponseDTO register(UserRegisterRequestDTO userRegisterDTO) {
-    	log.info("Inicio de registro de usuario");
+    	log.info("Start of user registration");
     	
 	    Pattern pattern = Pattern.compile(passwordPattern);
 	
 	    Matcher matcher = pattern.matcher(userRegisterDTO.getPassword());
 	    boolean matches = matcher.matches();
 	    if (!matches) {
-	    	throw new BadRequestException("La contraseña no cumple con el formato");
+	    	throw new BadRequestException("The password does not comply with the format");
 	    }
     
         User user = userRegisterMapper.toEntity(userRegisterDTO);
@@ -67,13 +67,13 @@ public class UserServiceImpl implements UserService {
         user.setToken(UUID.randomUUID().toString());
         userRepository.save(user);
         
-        log.info("Registro de usuario exitoso");
+        log.info("Successful user registration");
         return userResponseMapper.toDto(user);
     }
 
 	@Override
-	public JWTToken login(UserLoginRequestDTO userLoginDTO) {
-		log.info("Inicio de autenticacion");
+	public JwtToken login(UserLoginRequestDTO userLoginDTO) {
+		log.info("Authentication start");
 		
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail(), userLoginDTO.getPassword()));
@@ -86,30 +86,30 @@ public class UserServiceImpl implements UserService {
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
-        log.info("Autenticacion exitosa");
-		return new JWTToken(jwt);
+        log.info("Successful authentication");
+		return new JwtToken(jwt);
 	}
 
 	@Override
 	public void activateAccount(ActivateAccountDTO activateAccountDTO) {
-		log.info("Activando cuenta de usuario");
+		log.info("Activating user account");
 		
 		Optional<User> userOpt = userRepository.findByEmailAndToken(activateAccountDTO.getEmail(), activateAccountDTO.getToken());
 		if (!userOpt.isPresent()) {
-			log.error("Activacion invalidad - usuario y token no encontrado");
-			throw new RuntimeException("Activacion invalidad");
+			log.error("Invalid activation - User and token not found");
+			throw new RuntimeException("Invalid activation");
 		}
 		User user = userOpt.get();
 		user.setActive(true);
 		user.setModified(LocalDateTime.now());
 		userRepository.save(user);
 		
-		log.info("Cuenta activada satisfactoriamente");
+		log.info("Activated user account");
 	}
 	
 	@Override
 	public UserResponseDTO updateProfile(String email, UserProfileRequestDTO userProfileDTO) {
-		log.info("Actualizando perfil");
+		log.info("Updating profile");
 		
 		User user = userRepository.findByEmail(email).get();
 
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
 		user.setModified(LocalDateTime.now());
 		userRepository.save(user);
 		
-		log.info("Actualizacion del perfil exitosa");
+		log.info("Successful profile update");
 		return userResponseMapper.toDto(user);
 	}
 	

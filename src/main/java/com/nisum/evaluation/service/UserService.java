@@ -5,13 +5,13 @@ import com.nisum.evaluation.dto.UserLoginRequestDTO;
 import com.nisum.evaluation.dto.UserProfileRequestDTO;
 import com.nisum.evaluation.dto.UserRegisterRequestDTO;
 import com.nisum.evaluation.dto.UserResponseDTO;
-import com.nisum.evaluation.security.JWTToken;
+import com.nisum.evaluation.security.JwtToken;
 
 public interface UserService {
 
 	UserResponseDTO register(UserRegisterRequestDTO userRegisterDTO);
 	
-	JWTToken login(UserLoginRequestDTO userLoginDTO);
+	JwtToken login(UserLoginRequestDTO userLoginDTO);
 	
 	void activateAccount(ActivateAccountDTO activateAccountDTO);
 	

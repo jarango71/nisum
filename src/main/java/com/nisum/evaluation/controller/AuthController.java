@@ -18,7 +18,7 @@ import com.nisum.evaluation.dto.UserLoginRequestDTO;
 import com.nisum.evaluation.dto.UserProfileRequestDTO;
 import com.nisum.evaluation.dto.UserRegisterRequestDTO;
 import com.nisum.evaluation.dto.UserResponseDTO;
-import com.nisum.evaluation.security.JWTToken;
+import com.nisum.evaluation.security.JwtToken;
 import com.nisum.evaluation.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class AuthController {
         if (userService.userExists(userRegisterDTO.getEmail())) {
             return ResponseEntity
                 .badRequest()
-                .body(new MessageResponseDTO("El correo ya registrado"));
+                .body(new MessageResponseDTO("Email already registered"));
         }
 
         UserResponseDTO response = userService.register(userRegisterDTO);
@@ -47,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JWTToken> authenticateUser(@Valid @RequestBody UserLoginRequestDTO userLoginRequestDTO) {
+    public ResponseEntity<JwtToken> authenticateUser(@Valid @RequestBody UserLoginRequestDTO userLoginRequestDTO) {
        
     	return ResponseEntity.ok(userService.login(userLoginRequestDTO));
 	}
@@ -57,7 +57,7 @@ public class AuthController {
     	
     	userService.activateAccount(activateAccountDTO);
 
-    	return ResponseEntity.ok(new MessageResponseDTO("La cuenta se ha activado con exito"));
+    	return ResponseEntity.ok(new MessageResponseDTO("The account has been activated successfully"));
 	}
 
     @PutMapping("/user/profile")

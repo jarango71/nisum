@@ -25,7 +25,7 @@ mvnw clean verify
 
 ## Postman
 
-En el proyecto se provee una colección ***nisum.postman_collection.json*** exportada de postman, la cual se recomienda importar en el postman para probar la aplicacion.
+En el proyecto se provee una colección ***nisum.postman_collection.json*** exportada de postman, la cual se recomienda importar para probar la aplicacion.
 
 Para probar las funcionalidades desde postman deben seguir el siguiente orden:
 
@@ -57,7 +57,7 @@ La respuesta esperada es como el siguiente JSON:
     "isactive": false
 }
 ```
-2. El siguiente paso seria activar la cuenta, para esto ejecutar en endpoint ***http://localhost:8080/api/auth/activate/account***, el cual necesita como dato de entrada el ***token*** que retorno la llamada anterior. Un ejemplo de la peticion que se necesita se muestra en el json a continuacion:
+2. El siguiente paso seria activar la cuenta, para esto ejecutar en endpoint ***http://localhost:8080/api/auth/activate/account***, el cual necesita como dato de entrada el ***token*** que retorno la llamada anterior. Un ejemplo de la peticion que se necesita se muestra en el JSON a continuacion:
 ``` json 
 {
     "email": "jarango71@gmail.com",
@@ -71,7 +71,7 @@ La respuesta esperada es como el siguiente JSON:
     "password": "Arango2411"
 }
 ```
-4. Este paso consumir servicios que requieran autorizacion y autenticación. Para esto se expone un endpoint que permite cambiar el nombre del usuario en su perfil, a travez del endpoint ***http://localhost:8080/api/auth/user/profile***, se le debe pasar el header: ***Authorization: Bearer token que retorno el login*** 
+4. En este paso ya se puede consumir servicios que requieren autenticación y autorizacion. Para esto se expone un endpoint que permite cambiar el nombre del usuario en su perfil, a travez del endpoint ***http://localhost:8080/api/auth/user/profile***, se le debe pasar el header: ***Authorization: Bearer token que retorno el login*** 
 ``` json 
 {
     "name": "Jorge Arango Labrada"
