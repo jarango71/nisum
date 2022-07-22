@@ -9,6 +9,7 @@ import lombok.Data;
 public class ActivateAccountDTO {
 
 	@Email
+	@NotBlank
 	private String email;
 
 	@NotBlank
