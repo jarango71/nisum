@@ -29,7 +29,7 @@ En el proyecto se provee una colección ***nisum.postman_collection.json*** expo
 
 Para probar las funcionalidades desde postman deben seguir el siguiente orden:
 
-1. Ejecutar el endpoint ***http://localhost:8080/api/auth/register***. La petición debe contener un objeto JSON como el que se muestra, los valores de los campos pueden variar:
+1. Ejecutar el endpoint ***http://localhost:8080/api/auth/register***. La contraseña debe contener mayusculas, minusculas y numeros, además de tener al menos 8 caracteres. La petición debe contener un objeto JSON como el que se muestra, los valores de los campos pueden variar:
 
 ``` json 
 {

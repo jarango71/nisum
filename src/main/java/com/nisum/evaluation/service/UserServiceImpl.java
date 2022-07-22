@@ -3,7 +3,10 @@ package com.nisum.evaluation.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +19,7 @@ import com.nisum.evaluation.dto.UserLoginRequestDTO;
 import com.nisum.evaluation.dto.UserProfileRequestDTO;
 import com.nisum.evaluation.dto.UserRegisterRequestDTO;
 import com.nisum.evaluation.dto.UserResponseDTO;
+import com.nisum.evaluation.exception.BadRequestException;
 import com.nisum.evaluation.mapper.UserRegisterMapper;
 import com.nisum.evaluation.mapper.UserResponseMapper;
 import com.nisum.evaluation.repository.UserRepository;
@@ -40,11 +44,22 @@ public class UserServiceImpl implements UserService {
     
     private final UserResponseMapper userResponseMapper;
 
+    @Value("${user.password.regex}")
+    private String passwordPattern;
+
     
     @Override
 	public UserResponseDTO register(UserRegisterRequestDTO userRegisterDTO) {
     	log.info("Inicio de registro de usuario");
     	
+	    Pattern pattern = Pattern.compile(passwordPattern);
+	
+	    Matcher matcher = pattern.matcher(userRegisterDTO.getPassword());
+	    boolean matches = matcher.matches();
+	    if (!matches) {
+	    	throw new BadRequestException("La contraseña no cumple con el formato");
+	    }
+    
         User user = userRegisterMapper.toEntity(userRegisterDTO);
         user.setActive(false);
         user.setCreated(LocalDateTime.now());
