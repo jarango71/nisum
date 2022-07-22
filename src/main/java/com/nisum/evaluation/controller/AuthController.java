@@ -61,7 +61,7 @@ public class AuthController {
 	}
 
     @PutMapping("/user/profile")
-    public ResponseEntity<UserResponseDTO> userProfile(Principal principal, @Valid @RequestBody UserProfileRequestDTO userProfileDTO) {
+    public ResponseEntity<UserResponseDTO> updateProfile(Principal principal, @Valid @RequestBody UserProfileRequestDTO userProfileDTO) {
 
     	return ResponseEntity.ok(userService.updateProfile(principal.getName(), userProfileDTO));
 	}

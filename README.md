@@ -18,7 +18,9 @@ Para ejecutar los Test de la aplicacion, ejecute:
 
 
 ```
-mvnw test
+mvnw clean test
+o
+mvnw clean verify
 ```
 
 ## Postman
